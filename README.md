@@ -58,7 +58,7 @@ Microsoft Sentinel (SIEM)
         │
         ├── KQL Analytics Rules → Alerts
         │
-        └── Incidents Dashboard → Incident #1 & #2: "Successful Local Logins"
+        └── Incidents Dashboard → 3 Incidents: "Successful Local Logins"
 ```
 
 ---
@@ -83,53 +83,29 @@ All resources deployed successfully — the VM, network interface, virtual netwo
 
 ### Step 3 — VM Running
 
-Confirmed **SorasVM** is live and running in Azure with a public IP assigned and all networking configured.
+Confirmed **SorasVM** is live and running in Azure with a public IP assigned, Azure Monitor Agent ready, and all networking configured.
 
 ![VM Overview](screenshots/image_19.png)
 
 ---
 
-### Step 4 — Create Log Analytics Workspace
+### Step 4 — Install Windows Security Events Data Connector
 
-Set up a Log Analytics Workspace called **Soras-LogAnalytics** in the same resource group. This is where all the VM's security logs will be stored and queried.
-
-![Log Analytics Setup](screenshots/image_03.png)
-
----
-
-### Step 5 — Add Microsoft Sentinel
-
-Connected Microsoft Sentinel to the Soras-LogAnalytics workspace. Sentinel was successfully added and is now ready to ingest and analyze logs.
-
-![Sentinel Added](screenshots/image_05.png)
-
----
-
-### Step 6 — Sentinel Overview (Initial)
-
-Explored the Sentinel dashboard. At this point no data has come in yet — the environment is set up but nothing is connected.
-
-![Sentinel Overview Empty](screenshots/image_06.png)
-
----
-
-### Step 7 — Install Windows Security Events Data Connector
-
-From the Content Hub, installed the **Windows Security Events** solution. This installs 2 data connectors, 2 workbooks, 20 analytics rule templates, and 50 hunting queries.
+From the Sentinel Content Hub, installed the **Windows Security Events** solution. This installs 2 data connectors, 2 workbooks, 20 analytics rule templates, and 50 hunting queries.
 
 ![Content Hub Install](screenshots/image_08.png)
 
 ---
 
-### Step 8 — Configure Data Collection Rule
+### Step 5 — Configure Data Collection Rule
 
-Set up the **Windows Security Events via AMA** connector and created a Data Collection Rule named **WindowsEventsToSentinel** to stream security logs from SorasVM into Sentinel.
+Set up the **Windows Security Events via AMA** connector and created a Data Collection Rule named **WindowsEventsToSentinel** to stream security logs from SorasVM directly into Sentinel.
 
 ![Data Collection Rule](screenshots/image_09.png)
 
 ---
 
-### Step 9 — Query Security Logs with KQL
+### Step 6 — Query Security Logs with KQL
 
 Once logs started flowing in, I wrote KQL queries in the Sentinel Logs panel to hunt for events. First query: filter all `SecurityEvent` records where the activity contains "success" — and got **real results back** from the VM.
 
@@ -137,15 +113,15 @@ Once logs started flowing in, I wrote KQL queries in the Sentinel Logs panel to 
 
 ---
 
-### Step 10 — Build a Custom Analytics Rule
+### Step 7 — Build a Custom Analytics Rule
 
 Used the Analytics Rule Wizard to create a scheduled detection rule using the same KQL logic. Set it to run every 5 hours and look back 5 hours of data — targeting successful logins that aren't system accounts.
 
-![Analytics Rule](screenshots/image_12.png)
+![Analytics Rule Wizard](screenshots/image_12.png)
 
 ---
 
-### Step 11 — Analytics Rules Dashboard
+### Step 8 — Analytics Rules Dashboard
 
 Confirmed the rule is active. The **Advanced Multistage Attack Detection** (Fusion) rule is also enabled — a high-severity ML-based rule that detects multi-stage attacks automatically.
 
@@ -153,7 +129,7 @@ Confirmed the rule is active. The **Advanced Multistage Attack Detection** (Fusi
 
 ---
 
-### Step 12 — Incidents Generated 🎯
+### Step 9 — Incidents Generated 🎯
 
 The analytics rule fired and created **real incidents** in Sentinel. Incident #1 and #2 are both titled "Successful Local Logins" with Medium severity — exactly what my detection rule was looking for.
 
@@ -161,11 +137,11 @@ The analytics rule fired and created **real incidents** in Sentinel. Incident #1
 
 ---
 
-### Step 13 — Final Sentinel Overview
+### Step 10 — Final Sentinel Overview
 
-The completed Sentinel dashboard showing 2 incidents, 2 active data connectors, 2 analytics rules, and live data flowing in. This is what a working mini-SOC looks like.
+The completed Sentinel dashboard showing **3 incidents detected**, 2 active data connectors, 2 analytics rules fully enabled, and live data flowing in across the timeline. This is what a working mini-SOC looks like.
 
-![Final Overview](screenshots/image_17.png)
+![Final Overview](screenshots/image_21.png)
 
 ---
 
@@ -196,7 +172,7 @@ The second query became the basis for the custom analytics rule that triggered t
 | Data Connectors Active | ✅ 2 connected |
 | Analytics Rules | ✅ 2 active rules |
 | KQL Queries Written | ✅ 2 custom queries |
-| Incidents Generated | ✅ 2 real incidents triggered |
+| Incidents Generated | ✅ 3 real incidents triggered |
 
 ---
 
@@ -218,19 +194,16 @@ azure-sentinel-lab/
 │
 ├── README.md
 └── screenshots/
+    ├── image_20.png  — VM creation config
     ├── image_01.png  — VM deployment success
-    ├── image_03.png  — Log Analytics workspace setup
-    ├── image_05.png  — Sentinel Content Hub
-    ├── image_06.png  — Sentinel overview (initial)
+    ├── image_19.png  — SorasVM running
     ├── image_08.png  — Windows Security Events install
     ├── image_09.png  — Data collection rule config
     ├── image_10.png  — KQL query with live results
     ├── image_12.png  — Analytics rule wizard
     ├── image_13.png  — Analytics rules dashboard
     ├── image_15.png  — Incidents generated
-    ├── image_17.png  — Final Sentinel overview
-    ├── image_19.png  — SorasVM running
-    └── image_20.png  — VM creation config
+    └── image_21.png  — Final Sentinel overview (3 incidents)
 ```
 
 ---
